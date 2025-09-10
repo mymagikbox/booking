@@ -1,0 +1,63 @@
+services:
+  proxy:
+    build: ./docker/proxy
+    container_name: ${APP_NAME:-yii}-nginx
+    restart: always
+    depends_on:
+      - php
+    # proxy должен общаться с php контейнером
+    links:
+      - php
+    command: [ nginx-debug, '-g', 'daemon off;' ]
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:80/health" ]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+    # монтируем директории, слева директории на основной машине, справа - куда они монтируются в контейнере
+    volumes:
+      - ./logs/nginx:/var/log/nginx
+    working_dir: /app
+    networks:
+      - php-yii
+  php: # fastcgi_pass link to here
+    build: ./docker/php
+    container_name: ${APP_NAME:-yii}-php
+
+    restart: always
+    # You can use .env file for configuring environment's variables
+    user: "${UID:-0}:${GID:-0}"
+    # php должен общаться с database контейнером
+    links:
+      - db
+    depends_on:
+      db:
+        condition: service_healthy
+    working_dir: /app
+    environment:
+      - COMPOSER_ALLOW_SUPERUSER=1
+    volumes:
+      - ./:/app
+    healthcheck:
+      test: /bin/bash -c 'php-fpm -t || exit 1'
+      interval: 3s #Интервал попыток запуска теста
+      timeout: 5s #Отложенность запуска команды
+      retries: 5 #Количество повторений
+      start_period: 1s #Через сколько стартовать тест после запуска контейнера
+    networks:
+      - php-yii
+  db:
+    build: ./docker/db
+    container_name: ${APP_NAME:-yii}-db
+    volumes:
+      - ./docker/db/data:/var/lib/postgresql/data:rw
+    healthcheck:
+      test: [ "CMD", "pg_isready", "-d", "${POSTGRES_DB}", "-U", "${POSTGRES_USER}" ]
+      timeout: 5s
+      retries: 5
+      start_period: 60s
+    networks:
+      - php-yii
+
+networks:
+  php-yii:
