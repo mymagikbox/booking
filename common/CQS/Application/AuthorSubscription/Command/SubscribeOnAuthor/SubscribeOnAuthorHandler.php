@@ -27,8 +27,6 @@ class SubscribeOnAuthorHandler
 
             $this->subscribeOnAuthorRepository->createOrException($command);
 
-            // may be Event NewSubscribeOnAuthorEvent for client notice
-
             $transaction->commit();
         } catch (Exception $e) {
             $transaction->rollBack();

@@ -11,7 +11,6 @@ interface AuthorRepositoryInterface
 {
     public function getAllAuthorIdNameList(): array;
     public function findOneById(int $id): ?Author;
-
     public function createOrException(CreateAuthorCommand $command): Author;
     public function updateOrException(Author $model, UpdateAuthorCommand $command): void;
     public function deleteOrException(Author $model): void;

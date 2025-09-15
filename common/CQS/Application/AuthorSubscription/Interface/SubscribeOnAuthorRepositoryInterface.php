@@ -8,4 +8,10 @@ use common\CQS\Domain\Entity\AuthorSubscription;
 interface SubscribeOnAuthorRepositoryInterface
 {
     public function createOrException(SubscribeOnAuthorCommand $command): AuthorSubscription;
+
+    /***
+     * @param array $authorIdList
+     * @return AuthorSubscription[]
+     */
+    public function getSubscribersByAuthor(array $authorIdList, callable $fn): void;
 }
