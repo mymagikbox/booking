@@ -1,4 +1,7 @@
 <?php
+namespace console\migrations;
+
+use Yii;
 
 abstract class Migration extends \yii\db\Migration
 {

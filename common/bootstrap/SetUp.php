@@ -1,0 +1,65 @@
+<?php
+declare(strict_types=1);
+
+namespace common\bootstrap;
+
+use common\CQS\Application\Author\Interface\AuthorRepositoryInterface;
+use common\CQS\Application\Book\Interface\BookAuthorAssignRepositoryInterface;
+use common\CQS\Application\Book\Interface\BookRepositoryInterface;
+use common\CQS\Application\Report\Interface\ReportRepositoryInterface;
+use common\CQS\Domain\Interface\Storage\FileStorageInterface;
+use common\CQS\Infrastructure\ActiveRecord\Repository\AuthorRepository;
+use common\CQS\Infrastructure\ActiveRecord\Repository\BookAuthorAssignRepository;
+use common\CQS\Infrastructure\ActiveRecord\Repository\BookRepository;
+use common\CQS\Infrastructure\ActiveRecord\Repository\ReportRepository;
+use common\CQS\Infrastructure\Storage\FileStorage;
+use common\CQS\Modules\Smspilot\Domain\Interface\SmspilotHttpClientInterface;
+use common\CQS\Modules\Smspilot\Infrastructure\Adapter\Http\SmspilotHttpClient;
+use Yii;
+use yii\base\BootstrapInterface;
+use Symfony\Component\HttpClient\HttpClient as SymfonyClient;
+
+final class SetUp implements BootstrapInterface
+{
+    public function bootstrap($app): void
+    {
+        $container = Yii::$container;
+
+        $container->set(BookRepositoryInterface::class, function () use ($app) {
+            return new BookRepository();
+        });
+
+        $container->set(BookAuthorAssignRepositoryInterface::class, function () use ($app) {
+            return new BookAuthorAssignRepository();
+        });
+
+        $container->set(AuthorRepositoryInterface::class, function () use ($app) {
+            return new AuthorRepository();
+        });
+
+        $container->set(ReportRepositoryInterface::class, function () use ($app) {
+            return new ReportRepository();
+        });
+
+        $container->set(SmspilotHttpClientInterface::class, function () use ($app) {
+            $httpClient = SymfonyClient::create([
+                'base_uri' => $_ENV['SMSPILOT_API_HOST'],
+                'headers' => [
+                    'Content-Type' => 'application/json',
+                ],
+            ]);
+
+            return new SmspilotHttpClient(
+                $httpClient,
+                $_ENV['SMSPILOT_API_KEY']
+            );
+        });
+
+        $container->set(FileStorageInterface::class, function () use ($app) {
+            return new FileStorage(
+                '@frontend/web/files/storage',
+                '/files/storage'
+            );
+        });
+    }
+}

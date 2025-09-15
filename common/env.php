@@ -2,8 +2,16 @@
 /**
  * Setup application environment
  */
-$dotenv = new \Dotenv\Dotenv(dirname(__DIR__));
+$dotenv = \Dotenv\Dotenv::createImmutable(dirname(__DIR__));
 $dotenv->load();
 
-defined('YII_DEBUG') or define('YII_DEBUG', getenv('YII_DEBUG') === 'true');
-defined('YII_ENV') or define('YII_ENV', getenv('YII_ENV') ?: 'prod');
+
+$dotenv->required([
+    'APP_NAME',
+
+    'DB_DSN',
+    'POSTGRES_HOST',
+    'POSTGRES_DB',
+    'POSTGRES_PASSWORD',
+    'POSTGRES_USER',
+]);

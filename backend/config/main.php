@@ -37,6 +37,20 @@ return [
         'errorHandler' => [
             'errorAction' => 'site/error',
         ],
+        'urlManager' => [
+            'class' => 'yii\web\UrlManager', //Set class
+            'enablePrettyUrl' => true,
+            //'enableStrictParsing' => true,
+            'showScriptName' => false,
+            'rules' => [
+                ''=>'site/index',
+
+                '<controller:\w+>/<action:\w+>/<id:\d+>' => '<controller>/<action>',
+                '<controller:\w+>/<action:\w+>' => '<controller>/<action>',
+                '<controller:\w+>/<action:\w+>/page/<page:\d+>' => '<controller>/<action>',
+                '<module:\w+>/<controller:\w+>/<action:\w+>' => '<module>/<controller>/<action>',
+            ],
+        ],
         /*
         'urlManager' => [
             'enablePrettyUrl' => true,

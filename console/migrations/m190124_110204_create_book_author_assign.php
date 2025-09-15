@@ -1,12 +1,13 @@
 <?php
 
-use yii\db\Migration;
+use common\CQS\Domain\Entity\BookAuthorAssign;
+use console\migrations\Migration;
 
 class m190124_110204_create_book_author_assign extends Migration
 {
     protected function getTable(): string
     {
-        return '{{%book_author_assign}}';
+        return BookAuthorAssign::tableName();
     }
 
     public function up(): void

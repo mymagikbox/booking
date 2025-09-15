@@ -1,12 +1,14 @@
 <?php
 
-use yii\db\Migration;
+
+use common\CQS\Domain\Entity\Author;
+use console\migrations\Migration;
 
 class m190124_110202_add_author_table extends Migration
 {
     protected function getTable(): string
     {
-        return '{{%author}}';
+        return Author::tableName();
     }
 
     public function up(): void
@@ -14,9 +16,14 @@ class m190124_110202_add_author_table extends Migration
         $this->createTable($this->getTable(), [
             'id' => $this->primaryKey(),
             'username' => $this->string()->notNull(),
-            'created_at' => $this->integer(),
-            'updated_at' => $this->integer(),
+            'slug' => $this->string()->notNull(),
+            'created_by' => $this->integer()->notNull(),
+            'updated_by' => $this->integer()->notNull(),
+            'created_at' => $this->integer()->notNull(),
+            'updated_at' => $this->integer()->notNull(),
         ]);
+
+        $this->createIndex('idx_author_slug', $this->getTable(), 'slug', true);
     }
 
     public function down(): void

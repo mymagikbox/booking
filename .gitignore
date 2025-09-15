@@ -5,6 +5,9 @@
 
 /logs
 
+# env
+.env
+
 # phpstorm project files
 .idea
 
