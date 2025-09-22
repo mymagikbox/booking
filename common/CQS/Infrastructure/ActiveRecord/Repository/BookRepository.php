@@ -9,14 +9,16 @@ use common\CQS\Application\Book\Interface\BookRepositoryInterface;
 use common\CQS\Domain\Entity\Book;
 use common\CQS\Domain\Exception\DeleteException;
 use common\CQS\Domain\Exception\SaveException;
+use yii\helpers\VarDumper;
 
 final class BookRepository implements BookRepositoryInterface
 {
     public function createOrException(CreateBookCommand $command): Book
     {
-        $model = new Book($command->getAttributes());
+        $model = new Book();
+        $model->setAttributes($command->getAttributes(), false);
 
-        if(!$model->save(false)) {
+        if (!$model->save(false)) {
             throw new SaveException();
         }
 
@@ -25,7 +27,7 @@ final class BookRepository implements BookRepositoryInterface
 
     public function updateOrException(Book $model, UpdateBookCommand $command): void
     {
-        $model->setAttributes($command->getAttributes());
+        $model->setAttributes($command->getAttributes(), false);
 
         if(!$model->save(false)) {
             throw new SaveException();

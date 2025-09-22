@@ -26,13 +26,13 @@ class ConsumeEventController extends BaseController
     {
         $this->writeInfo('Starting event consumer...');
 
-        try {
+        // try {
             $this->asyncEventConsumer->consume();
-        } catch (Throwable $e) {
+        /*} catch (Throwable $e) {
             $this->writeError('Error: ' . $e->getMessage());
 
             return ExitCode::UNSPECIFIED_ERROR;
-        }
+        }*/
 
         return ExitCode::OK;
     }

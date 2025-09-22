@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace common\CQS\Application\Book\EventHandler;
+namespace common\CQS\Application\AuthorSubscription\EventListener;
 
 use common\CQS\Application\AuthorSubscription\Interface\SubscribeOnAuthorRepositoryInterface;
 use common\CQS\Application\Book\Event\BookCreatedEvent;
@@ -30,6 +30,8 @@ class ClientInformerEventListener implements EventListenerInterface
     public function handle(EventInterface $event): void
     {
         try {
+            Yii::info("Start Client Informer");
+
             $this->subscribeOnAuthorRepository->getSubscribersByAuthor(
                 $event->getAuthorIdList(),
                 function (AuthorSubscription $subscriber) use ($event) {
@@ -42,9 +44,9 @@ class ClientInformerEventListener implements EventListenerInterface
                 }
             );
         } catch (Exception $e) {
-            Yii::debug("Error: " . self::class . ". Message: {$e->getMessage()}");
+            Yii::error("Error: " . self::class . ". Message: {$e->getMessage()}");
 
-            throw new $e;
+            throw $e;
         }
     }
 }

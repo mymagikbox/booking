@@ -31,3 +31,13 @@ RUN ln -fs /usr/share/zoneinfo/Europe/Moscow /etc/localtime && dpkg-reconfigure 
 # Enable and configure xdebug
 RUN pecl install xdebug-3.2.0 \
     && docker-php-ext-enable xdebug
+
+# AMQP extension
+RUN apt-get install -y \
+    librabbitmq-dev \
+    libssl-dev \
+    && docker-php-ext-install \
+		bcmath \
+		sockets \
+	&& pecl install amqp \
+	&& docker-php-ext-enable amqp

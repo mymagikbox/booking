@@ -44,7 +44,7 @@ final class UpdateAuthorHandler
 
             Yii::debug("Error: " . self::class . ". Message: {$e->getMessage()}");
 
-            throw new $e;
+            throw $e;
         }
     }
 }

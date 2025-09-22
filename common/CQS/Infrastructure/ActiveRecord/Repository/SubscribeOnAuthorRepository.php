@@ -12,7 +12,8 @@ class SubscribeOnAuthorRepository implements SubscribeOnAuthorRepositoryInterfac
 {
     public function createOrException(SubscribeOnAuthorCommand $command): AuthorSubscription
     {
-        $model = new AuthorSubscription($command->getAttributes());
+        $model = new AuthorSubscription();
+        $model->setAttributes($command->getAttributes(), false);
 
         if(!$model->save(false)) {
             throw new SaveException();

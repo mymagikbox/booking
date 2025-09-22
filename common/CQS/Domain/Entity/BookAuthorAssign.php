@@ -10,11 +10,6 @@ use yii\db\ActiveRecord;
  * @property int $book_id
  * @property int $author_id
  *
- * @property integer $created_at
- * @property integer $updated_at
- * @property integer $created_by
- * @property integer $updated_by
- *
  * @property Author $author
  * @property Book $book
  */
@@ -27,15 +22,7 @@ class BookAuthorAssign extends ActiveRecord
 
     public static function tableName(): string
     {
-        return '{{%author}}';
-    }
-
-    public function behaviors(): array
-    {
-        return [
-            TimestampBehavior::class,
-            BlameableBehavior::class,
-        ];
+        return '{{%book_author_assign}}';
     }
 
     public function getAuthor()
@@ -51,8 +38,8 @@ class BookAuthorAssign extends ActiveRecord
     public static function create(int $authorId, int $bookId): static
     {
         return new static([
-            'author_id' => $authorId,
             'book_id' => $bookId,
+            'author_id' => $authorId,
         ]);
     }
 }

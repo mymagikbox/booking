@@ -15,6 +15,9 @@ class CreateBookCommand extends BaseModel
     public $description;
     public $isbn;
     public array $authorIdList = [];
+
+    public ?int $created_by = null;
+    public ?int $updated_by = null;
     public ?UploadedFile $coverImageFile = null;
     public ?string $cover_image = null;
 
@@ -23,8 +26,8 @@ class CreateBookCommand extends BaseModel
         return [
             [['title', 'year', 'description', 'isbn'], 'required'],
             [['title', 'description'], 'string', 'max' => 255],
-            [['isbn'], 'string', 'max' => 10],
-            [['year',], 'integer'],
+            [['isbn'], 'string', 'max' => 20],
+            [['year', 'created_by', 'updated_by'], 'integer'],
             ['year', 'validateCorrectYear'],
             ['isbn', 'validateCorrectIsbn'],
             [
@@ -71,7 +74,7 @@ class CreateBookCommand extends BaseModel
     {
         if (!$this->hasErrors()) {
             if (!ValidationHelper::isValidIsbn10($this->isbn)) {
-                $this->addError($attribute, "");
+                $this->addError($attribute, "Isbn not correct");
             }
         }
     }

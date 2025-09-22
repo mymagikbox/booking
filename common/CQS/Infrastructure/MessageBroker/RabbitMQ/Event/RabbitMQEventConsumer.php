@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace common\CQS\Infrastructure\MessageBroker\RabbitMQ\Event;
 
+use common\CQS\Domain\Event\Trait\DomainEventTrait;
 use common\CQS\Domain\Interface\Event\AsyncEventConsumerInterface;
 use common\CQS\Domain\Interface\Event\EventInterface;
 use common\CQS\Domain\Interface\Event\SyncEventDispatcherInterface;
@@ -15,11 +16,11 @@ use Yii;
 
 final class RabbitMQEventConsumer implements AsyncEventConsumerInterface
 {
+    use DomainEventTrait;
+
     public function __construct(
         private RabbitMQConnection $rabbitMQConnection,
         private SyncEventDispatcherInterface $eventDispatcher,
-        private string $exchangeName = 'domain_events',
-        private string $queueName = 'domain_events_queue'
     )
     {}
 
@@ -28,26 +29,7 @@ final class RabbitMQEventConsumer implements AsyncEventConsumerInterface
         $connection = $this->rabbitMQConnection->getConnection();
         $channel = $connection->channel();
 
-        // Declare exchange
-        $channel->exchange_declare(
-            $this->exchangeName,
-            'direct',
-            false,
-            true,
-            false
-        );
-
-        // Declare queue
-        $channel->queue_declare(
-            $this->queueName,
-            false,
-            true,
-            false,
-            false
-        );
-
-        // Bind all events
-        $channel->queue_bind($this->queueName, $this->exchangeName, '#');
+        $this->prepareChanelAndQueue($channel);
 
         Yii::debug("[*] Waiting for messages. To exit press CTRL+C\n");
 

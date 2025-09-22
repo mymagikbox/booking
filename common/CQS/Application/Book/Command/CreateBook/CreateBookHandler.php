@@ -5,19 +5,18 @@ namespace common\CQS\Application\Book\Command\CreateBook;
 
 use common\CQS\Application\Book\Event\BookCreatedEvent;
 use common\CQS\Application\Book\Interface\BookAuthorAssignRepositoryInterface;
+use common\CQS\Application\Book\Interface\BookRepositoryInterface;
+use common\CQS\Domain\Exception\ValidationException;
 use common\CQS\Domain\Interface\Event\AsyncEventDispatcherInterface;
 use common\CQS\Domain\Interface\Storage\FileStorageInterface;
-use common\CQS\Domain\Exception\ValidationException;
-use common\CQS\Application\Book\Interface\BookRepositoryInterface;
 use Exception;
-
 use Yii;
 use yii\web\UploadedFile;
 
 final class CreateBookHandler
 {
     public function __construct(
-        private BookRepositoryInterface $bookRepository,
+        private BookRepositoryInterface             $bookRepository,
         private BookAuthorAssignRepositoryInterface $bookAuthorAssignRepository,
         private FileStorageInterface $storage,
         private AsyncEventDispatcherInterface $asyncEventDispatcher,
@@ -68,7 +67,7 @@ final class CreateBookHandler
 
             Yii::debug("Error: " . self::class . ". Message: {$e->getMessage()}");
 
-            throw new $e;
+            throw $e;
         }
     }
 }

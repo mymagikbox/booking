@@ -23,6 +23,7 @@ services:
   php: # fastcgi_pass link to here
     build: ./docker/php
     container_name: ${APP_NAME:-yii}-php
+    env_file: .env
 
     restart: always
     # You can use .env file for configuring environment's variables
@@ -30,8 +31,11 @@ services:
     # php должен общаться с database контейнером
     links:
       - db
+      - rabbitmq
     depends_on:
       db:
+        condition: service_healthy
+      rabbitmq:
         condition: service_healthy
     working_dir: /app
     environment:
@@ -56,6 +60,20 @@ services:
       timeout: 5s
       retries: 5
       start_period: 60s
+    networks:
+      - php-yii
+  rabbitmq:
+    build: ./docker/rabbitmq
+    container_name: ${APP_NAME:-yii}-rabbitmq
+    restart: always
+    volumes:
+      - ./docker/rabbitmq/data:/var/lib/rabbitmq
+    healthcheck:
+      test: [ "CMD", "rabbitmq-diagnostics", "-q", "ping" ] # A basic check, you may need to pass the Erlang cookie
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 10s
     networks:
       - php-yii
 

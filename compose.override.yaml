@@ -38,3 +38,16 @@ services:
       - target: 5432
         published: 6432
         protocol: tcp
+  rabbitmq:
+    #hostname: ${RABBITMQ_HOST:-rabbitmq}
+    ports:
+      - target: ${RABBITMQ_PORT:-5672}  # AMQP protocol port
+        published: 5672
+        protocol: tcp
+      - target: ${RABBITMQ_ADMIN_PORT:-15672} # RabbitMQ Management UI port
+        published: 15672
+        protocol: tcp
+    environment:
+      - RABBITMQ_DEFAULT_USER=${RABBITMQ_USER:-admin}
+      - RABBITMQ_DEFAULT_PASS=${RABBITMQ_PASS:-123456}
+    #  - RABBITMQ_SERVER_ADDITIONAL_ERL_ARGS=-rabbit disk_free_limit 2147483648

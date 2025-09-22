@@ -9,6 +9,9 @@ use common\CQS\Application\Book\Command\CreateBook\CreateBookCommand;
 use common\CQS\Application\Book\Command\CreateBook\CreateBookHandler;
 use common\CQS\Application\Book\Command\UpdateBook\UpdateBookCommand;
 use common\CQS\Application\Book\Command\UpdateBook\UpdateBookHandler;
+use common\CQS\Application\Book\Event\BookCreatedEvent;
+use common\CQS\Domain\Interface\Event\AsyncEventDispatcherInterface;
+use common\CQS\Domain\Interface\Event\SyncEventDispatcherInterface;
 use Exception;
 use kartik\alert\AlertInterface;
 use Yii;
@@ -22,6 +25,8 @@ class BookController extends BaseAdminController
         private CreateBookHandler $createBookHandler,
         private UpdateBookHandler $updateBookHandler,
         private AuthorRepositoryInterface $authorRepository,
+        private AsyncEventDispatcherInterface $asyncEventDispatcher,
+        private SyncEventDispatcherInterface $syncEventDispatcher,
         $config = [],
     )
     {
@@ -32,6 +37,31 @@ class BookController extends BaseAdminController
     public function actionIndex()
     {
         return $this->render('index', []);
+    }
+
+    public function actionTest()
+    {
+        $id = 12;
+        $title = 'Book 4';
+        $authorIdList = [
+            1, 3, 5
+        ];
+
+        try {
+            $this->asyncEventDispatcher->dispatch(
+                new BookCreatedEvent(
+                    $id,
+                    $title,
+                    $authorIdList,
+                ),
+                BookCreatedEvent::eventName()
+            );
+            print_r("Book created");
+        } catch (Exception $e) {
+            print_r($e->getMessage());
+        }
+
+        return '';
     }
 
     public function actionCreate(): string|Response

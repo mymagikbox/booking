@@ -3,19 +3,23 @@ declare(strict_types=1);
 
 namespace common\CQS\Infrastructure\MessageBroker\RabbitMQ\Event;
 
+use common\CQS\Domain\Event\Trait\DomainEventTrait;
 use common\CQS\Domain\Interface\Event\AsyncEventDispatcherInterface;
 use common\CQS\Domain\Interface\Event\EventInterface;
 use common\CQS\Infrastructure\MessageBroker\RabbitMQ\RabbitMQConnection;
 use PhpAmqpLib\Message\AMQPMessage;
 use ReflectionClass;
+use Yii;
 
 final class RabbitMQEventDispatcher implements AsyncEventDispatcherInterface
 {
+    use DomainEventTrait;
+
     public function __construct(
         private RabbitMQConnection $rabbitMQConnection,
-        private readonly string    $exchangeName = 'domain_events',
     )
-    {}
+    {
+    }
 
     public function dispatch(EventInterface $event, string $eventName = null): void
     {
@@ -23,13 +27,7 @@ final class RabbitMQEventDispatcher implements AsyncEventDispatcherInterface
         $channel = $connection->channel();
 
         // Создаем обменник
-        $channel->exchange_declare(
-            $this->exchangeName,
-            'direct',
-            false,
-            true,
-            false
-        );
+        $this->prepareChanelAndQueue($channel);
 
         // Создаем сообщение
         $messageBody = json_encode([
@@ -38,16 +36,17 @@ final class RabbitMQEventDispatcher implements AsyncEventDispatcherInterface
             'occurred_at' => date('c')
         ]);
 
+        Yii::info("Event: {$eventName}, message: {$messageBody}");
+
         $message = new AMQPMessage(
             $messageBody,
             ['delivery_mode' => AMQPMessage::DELIVERY_MODE_PERSISTENT]
         );
 
-        $routingKey = $eventName;
-
-        $channel->basic_publish($message, $this->exchangeName, $routingKey);
+        $channel->basic_publish($message, $this->exchangeName, $this->routingKey);
 
         $channel->close();
+        $connection->close();
     }
 
     private function extractPayload(EventInterface $event): array

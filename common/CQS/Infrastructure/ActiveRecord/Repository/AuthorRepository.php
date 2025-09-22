@@ -31,7 +31,8 @@ final class AuthorRepository implements AuthorRepositoryInterface
 
     public function createOrException(CreateAuthorCommand $command): Author
     {
-        $model = new Author($command->getAttributes());
+        $model = new Author();
+        $model->setAttributes($command->getAttributes(), false);
 
         if(!$model->save(false)) {
             throw new SaveException();
@@ -42,7 +43,7 @@ final class AuthorRepository implements AuthorRepositoryInterface
 
     public function updateOrException(Author $model, UpdateAuthorCommand $command): void
     {
-        $model->setAttributes($command->getAttributes());
+        $model->setAttributes($command->getAttributes(), false);
 
         if(!$model->save(false)) {
             throw new SaveException();
