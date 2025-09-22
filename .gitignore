@@ -3,8 +3,6 @@
 /yii_test
 /yii_test.bat
 
-/logs/*
-
 # env
 .env
 
